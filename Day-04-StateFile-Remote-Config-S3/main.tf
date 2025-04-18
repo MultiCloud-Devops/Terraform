@@ -16,3 +16,7 @@ resource "aws_subnet" "tf_day04_subnet4" {
   cidr_block = "10.0.3.0/24"
   vpc_id = aws_vpc.tf_day04_vpc.id
 }
+resource "aws_subnet" "tf_day04_subnet3" {
+  cidr_block = "10.0.3.0/24"
+  vpc_id = aws_vpc.tf_day04_vpc.id 
+}
