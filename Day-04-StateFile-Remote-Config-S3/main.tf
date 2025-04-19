@@ -1,5 +1,8 @@
 resource "aws_vpc" "tf_day04_vpc" {
   cidr_block = "10.0.0.0/16"
+  tags = {
+    Name="tf_vpc1"
+  }
 }
 
 resource "aws_subnet" "tf_day04_subnet1" {
@@ -17,6 +20,14 @@ resource "aws_subnet" "tf_day04_subnet4" {
   vpc_id = aws_vpc.tf_day04_vpc.id
 }
 resource "aws_subnet" "tf_day04_subnet3" {
-  cidr_block = "10.0.3.0/24"
+  cidr_block = "10.0.2.0/24"
   vpc_id = aws_vpc.tf_day04_vpc.id 
+}
+
+resource "aws_subnet" "tf_day04_subnet6" {
+  cidr_block = "10.0.5.0/24"
+  vpc_id = aws_vpc.tf_day04_vpc.id
+  tags={
+    Name="tf_subnet_6"
+  } 
 }
