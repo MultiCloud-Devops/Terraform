@@ -1,6 +1,8 @@
 #vpc-creation
 resource "aws_vpc" "dev_vpc" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support = true 
   tags = {
     Name = "dev_vpc"
   }
@@ -26,6 +28,16 @@ resource "aws_subnet" "dev_public_subnet" {
 
 }
 
+resource "aws_subnet" "dev_public_subnet2" {
+  cidr_block = "10.0.2.0/24"
+  vpc_id = aws_vpc.dev_vpc.id
+  availability_zone = "ap-south-1a"
+  tags = {
+    Name="dev_public_subnet2"
+  }
+
+}
+
 #route table
 resource "aws_route_table" "dev_public_route_table" {
     vpc_id = aws_vpc.dev_vpc.id
@@ -40,6 +52,12 @@ resource "aws_route_table" "dev_public_route_table" {
 
 resource "aws_route_table_association" "dev_public_route_table_association" {
     subnet_id = aws_subnet.dev_public_subnet.id
+    route_table_id =  aws_route_table.dev_public_route_table.id
+  
+}
+
+resource "aws_route_table_association" "dev_public_route_table_association2" {
+    subnet_id = aws_subnet.dev_public_subnet2.id
     route_table_id =  aws_route_table.dev_public_route_table.id
   
 }
@@ -95,21 +113,21 @@ resource "aws_instance" "dev_public_instance" {
 
 
 #private server setup
-#elastic ip
-resource "aws_eip" "dev_eip" {
-  domain = "vpc"
-}
+# #elastic ip
+# resource "aws_eip" "dev_eip" {
+#   domain = "vpc"
+# }
 
-#natgateway
-resource "aws_nat_gateway" "dev_nat" {
-  allocation_id = aws_eip.dev_eip.id
-  subnet_id     =aws_subnet.dev_public_subnet.id
+# #natgateway
+# resource "aws_nat_gateway" "dev_nat" {
+#   allocation_id = aws_eip.dev_eip.id
+#   subnet_id     =aws_subnet.dev_public_subnet.id
 
-  tags = {
-    Name = "dev_nat"
-  }
-  depends_on = [ aws_internet_gateway.dev_ig ]
-}
+#   tags = {
+#     Name = "dev_nat"
+#   }
+#   depends_on = [ aws_internet_gateway.dev_ig ]
+# }
 
 #private subnet
 resource "aws_subnet" "dev_private_subnet" {
@@ -128,7 +146,7 @@ resource "aws_route_table" "dev_private_route_table" {
     vpc_id = aws_vpc.dev_vpc.id
     route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = aws_nat_gateway.dev_nat.id
+        #gateway_id = aws_nat_gateway.dev_nat.id
     }
     tags = {
       Name ="dev_private_rt"
@@ -154,3 +172,31 @@ resource "aws_instance" "dev_private_instance" {
     }
 }
 
+
+#mysql db instance
+#RDS subnet group
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  subnet_ids = [aws_subnet.dev_public_subnet.id, aws_subnet.dev_public_subnet2.id]
+  name = "rds_subnet_group"
+  tags = {
+    Name = "rds_subnet_group"
+  }
+}
+
+#RDS db instance
+resource "aws_db_instance" "default" {
+  allocated_storage    = 20
+  db_name              = "dev"
+  engine               = "mysql"
+  engine_version       = "8.0.41"
+  instance_class       = "db.t4g.micro"
+  username             = "admin"
+  password             = "Adminpassword123"
+  parameter_group_name = "default.mysql8.0"
+  skip_final_snapshot  = true
+  db_subnet_group_name = aws_db_subnet_group.rds_subnet_group.name
+  publicly_accessible = true
+  tags = {
+    Name = "db_instance"
+  }
+}
