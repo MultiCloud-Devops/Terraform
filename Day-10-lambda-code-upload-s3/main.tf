@@ -3,7 +3,7 @@
 # S3 Bucket to Store Lambda Code
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "dev-lambda-bucket-s3-tf"
-  acl    = "private"
+  # acl    = "private"
   force_destroy = true
 
   tags = {
