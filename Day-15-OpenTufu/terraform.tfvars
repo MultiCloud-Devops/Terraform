@@ -1,0 +1,5 @@
+ami_id ="ami-002f6e91abff6eb96"
+instance_type ="t2.micro"
+region="ap-south-1"
+az="ap-south-1a"
+instance_tag="dev_opentufu_server"
