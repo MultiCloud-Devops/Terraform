@@ -7,14 +7,25 @@ pipeline {
         //       // git branch: 'main', url: 'https://github.com/CloudTechDevOps/Terraform_CICD.git'
         //     }
         // }
-        stage('init') {
+        stage('tf init') {
             steps {
-                sh 'terraform init'
+                dir('Day-10-ec2-Userdata') {
+                    sh 'terraform init'
+}
             }
         }
-         stage('plan') {
+         stage('tf plan') {
             steps {
-                sh 'terraform plan'
+                dir('Day-10-ec2-Userdata') {
+                    sh 'terraform plan'
+                }
+            }
+        }
+        stage('tf apply') {
+            steps {
+                dir('Day-10-ec2-Userdata') {
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
     }
