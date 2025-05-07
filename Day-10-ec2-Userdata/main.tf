@@ -3,6 +3,6 @@ resource "aws_instance" "dev_userdata_server" {
    instance_type = "t2.micro"
    user_data = file("httpd.sh")
    tags = {
-      Name="jenkins_github_hook_triggerss_server"
+      Name="jenkins_github_hook_triggers_server"
    }
 }
